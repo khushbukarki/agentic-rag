@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Document Q&amp;A</title>
+<style>
+  :root { --ink:#1d2433; --muted:#5b6475; --line:#d9dde5; --paper:#f7f8fa; --accent:#2f5d8a; --hl:#fff4c2; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:16px/1.55 "Source Sans 3", system-ui, sans-serif; color:var(--ink); background:var(--paper); }
+  main { max-width:860px; margin:0 auto; padding:2.5rem 1.25rem 4rem; }
+  h1 { font-size:1.6rem; margin:0 0 .25rem; }
+  p.lead { color:var(--muted); margin:0 0 2rem; }
+  form { display:flex; gap:.5rem; flex-wrap:wrap; }
+  input[type=text] { flex:1 1 320px; padding:.75rem .9rem; font:inherit; border:1px solid var(--line); border-radius:6px; background:#fff; }
+  select, button { font:inherit; padding:.7rem 1rem; border-radius:6px; border:1px solid var(--line); background:#fff; }
+  button { background:var(--accent); color:#fff; border-color:var(--accent); cursor:pointer; }
+  button:focus-visible, input:focus-visible, select:focus-visible { outline:3px solid #9cc0e6; outline-offset:1px; }
+  #answer { margin-top:2rem; padding:1.25rem 1.4rem; background:#fff; border-left:4px solid var(--accent); white-space:pre-wrap; }
+  #answer:empty { display:none; }
+  .meta { color:var(--muted); font-size:.9rem; margin-top:.75rem; }
+  details { margin-top:1rem; background:#fff; border:1px solid var(--line); border-radius:6px; padding:.75rem 1rem; }
+  summary { cursor:pointer; font-weight:600; }
+  .src { border-top:1px solid var(--line); padding:.6rem 0; font-size:.92rem; }
+  .src b { color:var(--accent); }
+  aside { margin-top:2.5rem; font-size:.92rem; color:var(--muted); }
+  aside ul { padding-left:1.1rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Ask your documents</h1>
+  <p class="lead">Questions are answered only from the uploaded files, with the supporting passages shown.</p>
+
+  <form id="ask">
+    <input id="q" type="text" placeholder="e.g. How many days of annual leave do I get?" required minlength="3" aria-label="Question">
+    <select id="src" aria-label="Limit to document"><option value="">All documents</option></select>
+    <button type="submit">Ask</button>
+  </form>
+
+  <div id="answer" aria-live="polite"></div>
+  <div id="meta" class="meta"></div>
+  <div id="sources"></div>
+
+  <aside>
+    <form id="up" style="margin-bottom:1rem">
+      <input id="file" type="file" accept=".md,.txt,.pdf" aria-label="Document file">
+      <button type="submit">Upload document</button>
+    </form>
+    <div>Loaded documents:</div>
+    <ul id="docs"></ul>
+  </aside>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+
+async function loadDocs() {
+  const docs = await (await fetch('/documents')).json();
+  $('docs').innerHTML = docs.map(d => `<li>${esc(d.source)} (${d.chunks} chunks)</li>`).join('') || '<li>None yet. Upload one to start.</li>';
+  $('src').innerHTML = '<option value="">All documents</option>' + docs.map(d => `<option>${esc(d.source)}</option>`).join('');
+}
+
+$('ask').onsubmit = async e => {
+  e.preventDefault();
+  $('answer').textContent = 'Searching…'; $('sources').innerHTML = ''; $('meta').textContent = '';
+  const res = await fetch('/ask', {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({question: $('q').value, source: $('src').value || null})});
+  if (!res.ok) { $('answer').textContent = 'The question could not be answered. Check it is at least 3 characters.'; return; }
+  const data = await res.json();
+  $('answer').textContent = data.answer;
+  $('meta').textContent = `Mode: ${data.mode}. Tools used: ${data.tool_calls.map(t => t.tool).join(', ') || 'none'}.`;
+  if (data.sources.length) {
+    $('sources').innerHTML = `<details><summary>Supporting passages (${data.sources.length})</summary>` +
+      data.sources.map(s => `<div class="src"><b>${esc(s.id)}</b> · ${esc(s.section)}<br>${esc(s.text)}</div>`).join('') + '</details>';
+  }
+};
+
+$('up').onsubmit = async e => {
+  e.preventDefault();
+  const f = $('file').files[0]; if (!f) return;
+  const body = new FormData(); body.append('file', f);
+  const res = await fetch('/documents', {method:'POST', body});
+  if (!res.ok) alert((await res.json()).detail); else { $('file').value = ''; loadDocs(); }
+};
+loadDocs();
+</script>
+</body>
+</html>

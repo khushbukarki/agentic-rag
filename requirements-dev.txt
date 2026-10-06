@@ -1,0 +1,9 @@
+# Lightweight set for tests/CI: tests use the hash embedder + in-memory store,
+# so Chroma, torch and sentence-transformers are not needed here.
+fastapi>=0.110
+pydantic>=2.6
+python-multipart>=0.0.9
+numpy>=1.26
+httpx>=0.27
+pytest>=8.0
+ruff>=0.4

@@ -1,0 +1,14 @@
+{"question": "How many days of annual leave do full-time staff get?", "relevant_sources": ["leave_policy.md"], "expected_keywords": ["20 days"]}
+{"question": "Can I carry unused holiday into next year?", "relevant_sources": ["leave_policy.md"], "expected_keywords": ["five unused days"]}
+{"question": "How long before I qualify for paid sick leave?", "relevant_sources": ["leave_policy.md"], "expected_keywords": ["six months"]}
+{"question": "What top-up does the company pay during parental leave?", "relevant_sources": ["leave_policy.md"], "expected_keywords": ["80 percent"]}
+{"question": "How long do I have to submit an expense claim?", "relevant_sources": ["expense_policy.md"], "expected_keywords": ["30 days"]}
+{"question": "Who approves a 120 dollar expense claim?", "relevant_sources": ["expense_policy.md"], "expected_keywords": ["department manager"]}
+{"question": "What is the nightly accommodation limit when travelling?", "relevant_sources": ["expense_policy.md"], "expected_keywords": ["220 dollars"]}
+{"question": "Is there an allowance for a desk or monitor at home?", "relevant_sources": ["expense_policy.md"], "expected_keywords": ["600 dollars"]}
+{"question": "Will parking fines be reimbursed?", "relevant_sources": ["expense_policy.md"], "expected_keywords": ["parking fines"]}
+{"question": "What is the minimum password length?", "relevant_sources": ["it_security_policy.md"], "expected_keywords": ["14 characters"]}
+{"question": "Where is MFA required?", "relevant_sources": ["it_security_policy.md"], "expected_keywords": ["source control"]}
+{"question": "How quickly must a lost laptop be reported?", "relevant_sources": ["it_security_policy.md"], "expected_keywords": ["24 hours"]}
+{"question": "How do I connect to the production database?", "relevant_sources": ["it_security_policy.md"], "expected_keywords": ["bastion host"]}
+{"question": "What should I do with a suspicious phishing email?", "relevant_sources": ["it_security_policy.md"], "expected_keywords": ["report-phish"]}
